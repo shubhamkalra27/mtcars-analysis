@@ -1,0 +1,230 @@
+---
+title: "Does Mileage depend on transmission type"
+author: "Shubham Kalra"
+email: "iam@shubhamkalra.com"
+date: "Thursday, April 09, 2015"
+output: html_document
+---
+=======================================
+
+## Executive Summary
+In the 1974 Motor Trend US magazine came out with Data which comprises fuel Consumptions and 10 other aspects of automobile performance. 
+
+**Question**
+
+Does MPG depend on transmission type (automatic vs. manual)?, If so, which is better for MPG? Quantify the MPG difference between automatic and manual transmissions.  
+
+**Findings**   
+
+Analysis using the dataset was not able to find significant dependency of transmission type to fuel consumption. For modern cars with higher efficiency, it is less likely that there will be significant difference in Mileage. 
+
+-------------------------------------------------------------------
+
+
+## Data
+The data comprises fuel consumption and 10 aspects of automobile design and performance for 32 automobiles (1973–74 models).
+
+**mtcars is data frame with 32 observations on 11 variables**
+
+Variable | Definition
+------ | ----------------
+mpg  |  Miles/(US) gallon  
+cyl  |	Number of cylinders  
+disp	|	Displacement (cu.in.)  
+hp	|	Gross horsepower  
+drat	|	Rear axle ratio  
+wt	|	Weight (lb/1000)  
+qsec	|	1/4 mile time  
+vs	|	V/S  
+am	|	Transmission (0 = automatic, 1 = manual)  
+gear	|	Number of forward gears  
+carb	|	Number of carburetors	
+
+
+-------------------------------------------------------------------
+
+## Exploratory Data Analysis
+
+* Importing Data
+* Cleaning Data
+
+```{r}
+data(mtcars)
+#importing data in a variable
+cars <- mtcars
+
+# Changing classifying variables  from binary values to factor
+
+cars$cyl <- factor(cars$cyl)
+cars$vs <- factor(cars$vs)
+cars$am <- factor(cars$am)
+cars$gear <- factor(cars$gear)
+cars$carb <- factor(cars$carb)
+```
+
+
+
+**Data Visualizations**
+
+```{r, echo=FALSE}
+par(mfrow = c(1, 2)) 
+#visualize two graphs in one horizontal length
+# Add a Normal Curve (Thanks to Peter Dalgaard)
+x <- cars$mpg 
+h<-hist(x, breaks=10, col="cornflowerblue", xlab="Miles Per Gallon", 
+    main="Histogram with Normal Curve") 
+xfit<-seq(min(x),max(x),length=40) 
+yfit<-dnorm(xfit,mean=mean(x),sd=sd(x)) 
+yfit <- yfit*diff(h$mids[1:2])*length(x) 
+lines(xfit, yfit, col="blue", lwd=2)
+
+# Density Curve
+plot(density(cars$mpg), xlab = "MPG", main ="Density Plot of MPG")
+```
+
+* Curve shows a near Normal Distribution
+
+**Visualizing mpg vs am**
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+library(plyr)
+library(ggplot2)
+# Rename the levels of transmission types
+transmission <- revalue(cars$am, c('0'="automatic", '1'="manual"))
+ggplot(cars, aes(x=transmission, y=mpg, fill=transmission)) +
+  geom_boxplot() +
+  xlab("Transmission type") +
+  ylab("Miles per gallon")
+```
+
+from the box plot, we see.  
+
+* There are no real outliers in the dataset. 
+* Manual transmission is better than Automatic transmission, next we will check if they are statistically significant. 
+
+
+  
+  
+  
+#### Two Sample t-test
+
+Two Sample t-test is used to compare the means of a normally distributed interval dependent variable for two independent groups.
+
+``` {r}
+t.test(mpg~am, data = cars)
+```
+
+**Interpretation**   
+From the above output, we reject the null hypothesis With a p-value of **0.001374**,  and say that there is a statistically significant difference in mean mileage between Manual transmission and automatic transmission.
+
+We will now Quantify that difference using Regression techniques.
+
+
+-------------------------------------------------------------------
+
+
+## Regression Analysis 
+  
+####Simple linear regression
+
+
+`model1` is the model to explain the MPG variability with the `am` only.  
+
+
+``` {r}
+model1 <- lm( mpg~am ,data=mtcars); summary(model1)
+```
+
+**Interpretation**  
+
+* Coefficient value of am says that Automatic Transmission has **`r round(summary(model1)$coefficients[1],3)`** average MPG  
+* Intercepts value means that Manual transmission cars add **`r round(summary(model1)$coefficients[2],3)`** MPG's more to the Automatic's mean value  
+* Adj R square value says, that only **`r round(summary(model1)$adj.r.squared*100,2)`%** of deviation in model can be explained by the current model with one predictor.
+  
+
+
+> Before making any conclusions on the effect of transmission type on mileage, we look at the impact of other variables on the mileage
+
+
+
+  
+#### Multi-Variate Regression
+
+We run the Stepwise regression to identify useful subset of predictors. 
+
+```{r, eval=FALSE }
+nullModel <- lm (mpg ~ 1 , data =cars) # model with no predictor variables.
+
+fullModel <- lm (mpg ~ . , data = cars) # model with all variables added as predictor variables. 
+
+bestModel <- step(fullModel, nullModel, direction = "both") #both direction step model
+
+bestModel$call  #display formula
+```
+
+```{r, echo=FALSE }
+nullModel <- lm (mpg ~ 1 , data =cars) # model with no predictor variables.
+
+fullModel <- lm (mpg ~ . , data = cars) # model with all variables added as predictor variables. 
+
+bestModel <- step(fullModel, nullModel, direction = "both") #both direction step model
+
+bestModel$call  #display formula
+```
+
+
+* The variables mentioned by bestModel are uncorrelated and most significant to predict mpg
+* We will now run the anova to see if the new model is statistically different from the previous model. 
+
+
+```{r}
+anova(bestModel, model1)
+```
+
+From the above output, we reject the null hypothesis With a p-value of **`r anova(bestModel, model1)$Pr[2]`** ,  and say that there is a statistically significant difference in model1 and bestModel. 
+
+Summarizing the new Model.
+
+```{r}
+summary(bestModel)
+bestModel$call
+```
+  
+  
+  
+**Interpretation**  
+
+* The final model contains four predictors, cyl (number of cylinders), hp (horsepower), wt (weight) and am (transmission type).  
+  
+* Adjusted R square value says, that **`r round(summary(bestModel)$adj.r.squared*100,2)`%** of the variance can be explained by this model.  
+
+* Above 4 Cylinder has a negative impact on Mileage  
+    * A 6 cylinder engine reduces MPG by **`r round(abs(bestModel$coefficients[[2]]),3)`**  
+    * An 8 cylinder engine reduces the mileage by **`r round(abs(bestModel$coefficients[[3]]),3)`** MPG, respectively.  
+  
+  
+* Per unit **horsepower** increase decreases  mileage by **`r round(abs(bestModel$coefficients[[4]]),3) ` MPG**  
+  
+* A 1000 pound increase in weight reduces mileage by **`r round(abs(bestModel$coefficients[[5]]),3) ` MPG**  
+
+* For am `transmission type` we fail to reject the null hypothesis at p value of `0.20` , and can say that it does not contribute significantly to the variance. 
+
+-------------------------------------------------------------------
+
+  
+ 
+## Result
+
+1. Mileage of a car can be best calculated by model `lm(formula = mpg ~ cyl + hp + wt + am, data = cars)` 
+  
+2. This analysis was not able to find any significant link between the transmission type and fuel consumption   
+  
+  
+-----------------------------------------  
+  
+#### References. 
+
+1. mtcars dataset <https://stat.ethz.ch/R-manual/R-devel/library/datasets/html/mtcars.html>
+2. Density Plot. <http://www.statmethods.net/graphs/density.html>   
+3. Analysis on mtcars dataset to predict mpg <http://varianceexplained.org/RData/code/code_lesson3/>
+4. BoxPlot using ggplot2 <http://www.statmethods.net/advgraphs/ggplot2.html>
