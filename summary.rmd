@@ -1,27 +1,20 @@
 ---
 title: "Does Mileage depend on transmission type"
-author: "Shubham Kalra"
+author: "Shubham Kalra for Auto Magazine"
 email: "iam@shubhamkalra.com"
 date: "Thursday, April 09, 2015"
 output: html_document
 ---
 =======================================
 
-## Executive Summary
-In the 1974 Motor Trend US magazine came out with Data which comprises fuel Consumptions and 10 other aspects of automobile performance. 
-
-**Question**
-
-Does MPG depend on transmission type (automatic vs. manual)?, If so, which is better for MPG? Quantify the MPG difference between automatic and manual transmissions.  
-
-**Findings**   
-
-Analysis using the dataset was not able to find significant dependency of transmission type to fuel consumption. For modern cars with higher efficiency, it is less likely that there will be significant difference in Mileage. 
-
--------------------------------------------------------------------
+In the 1974 Motor Trend US magazine came out with datset which comprises fuel consumptions and 10 other aspects of automobile performance for 32 automobiles. Today, We look back to find parameters which determined the mileage of a car in that time. And quantify if cars with manual transmission or automatic transmission had a better mileage.  
+  
+The article is written keeping in mind audience with statistical know how.  One can replicate the study using code snippets provided alongside. To keep the analysis more organised and less overwheling i have divided into various sub-sections. Lets jump right into it. 
 
 
-## Data
+### Exploratory Data Analysis
+
+
 The data comprises fuel consumption and 10 aspects of automobile design and performance for 32 automobiles (1973–74 models).
 
 **mtcars is data frame with 32 observations on 11 variables**
@@ -43,15 +36,20 @@ carb	|	Number of carburetors
 
 -------------------------------------------------------------------
 
-## Exploratory Data Analysis
-
-* Importing Data
-* Cleaning Data
+We start with Importing Data into a new variable, say `cars`, and displaying first few observations of `cars` 
 
 ```{r}
 data(mtcars)
 #importing data in a variable
 cars <- mtcars
+head(cars)
+
+```
+
+One should also run `summary(cars)` to get more intresting stats about each variable. We see that a few variables like, Number of Cyclinders, Number of forward gears etc. are categorical variables. We convert those to something called as [factor variables](http://www.stat.berkeley.edu/~s133/factors.html) 
+
+
+```{r}
 
 # Changing classifying variables  from binary values to factor
 
@@ -64,7 +62,10 @@ cars$carb <- factor(cars$carb)
 
 
 
-**Data Visualizations**
+### Data Visualizations
+
+Next, we visualize the data to understand the behaviour of our response variable. 
+
 
 ```{r, echo=FALSE}
 par(mfrow = c(1, 2)) 
@@ -84,26 +85,41 @@ plot(density(cars$mpg), xlab = "MPG", main ="Density Plot of MPG")
 
 * Curve shows a near Normal Distribution
 
-**Visualizing mpg vs am**
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+nums <- sapply(cars, is.numeric)
+
+pairs(cars[,nums], main ="Finding Correlation among Variables", panel=function(x,y) {
+  points(x, y)
+  abline(lm(y ~ x), col="red")
+})
+
+```
+
+* Above is a pairs plot, which is used for drawing a scatter plot matrix to visually study the relationships between two variables.
+* We see a high correlation of mpg with many variables. 
+* Also, we see many correlations among predictor variables. 
+
 
 ```{r, echo=FALSE, message=FALSE, warning=FALSE}
 library(plyr)
 library(ggplot2)
 # Rename the levels of transmission types
 transmission <- revalue(cars$am, c('0'="automatic", '1'="manual"))
-ggplot(cars, aes(x=transmission, y=mpg, fill=transmission)) +
-  geom_boxplot() +
-  xlab("Transmission type") +
-  ylab("Miles per gallon")
+qplot(transmission, mpg, data=cars, geom=c("boxplot"), 
+   fill=am, main="Mileage by Transmission Type",
+   xlab="Transmission Type", ylab="Miles per Gallon")
+
 ```
 
 from the box plot, we see.  
 
 * There are no real outliers in the dataset. 
-* Manual transmission is better than Automatic transmission, next we will check if they are statistically significant. 
-
-
+* Manual transmission is better than Automatic transmission, next we will check if they are statistically significant using a [two sample t-test](http://www.itl.nist.gov/div898/handbook/eda/section3/eda353.htm)  
   
+  
+Don't worry about the code for the above plots, you can fork the entire code on github [here](https://github.com/shubhamkalra27/mtcars-analysis/blob/master/mtcars.R) 
+   
   
   
 #### Two Sample t-test
@@ -120,22 +136,17 @@ From the above output, we reject the null hypothesis With a p-value of **0.00137
 We will now Quantify that difference using Regression techniques.
 
 
--------------------------------------------------------------------
+###Simple linear regression
 
-
-## Regression Analysis 
-  
-####Simple linear regression
-
-
-`model1` is the model to explain the MPG variability with the `am` only.  
+Our first regression model is a model to explain the `mpg` variability with the `am` only.  
 
 
 ``` {r}
 model1 <- lm( mpg~am ,data=mtcars); summary(model1)
 ```
 
-**Interpretation**  
+
+**Interpretation of simple linear regression**  
 
 * Coefficient value of am says that Automatic Transmission has **`r round(summary(model1)$coefficients[1],3)`** average MPG  
 * Intercepts value means that Manual transmission cars add **`r round(summary(model1)$coefficients[2],3)`** MPG's more to the Automatic's mean value  
@@ -148,16 +159,16 @@ model1 <- lm( mpg~am ,data=mtcars); summary(model1)
 
 
   
-#### Multi-Variate Regression
+### Multiple Regression
 
-We run the Stepwise regression to identify useful subset of predictors. 
+Next, we would like to see dependence of other variables on Mileage. To find out which variables to use in our analysis, We run a Stepwise regression to identify useful subset of predictors. 
 
 ```{r, eval=FALSE }
 nullModel <- lm (mpg ~ 1 , data =cars) # model with no predictor variables.
 
 fullModel <- lm (mpg ~ . , data = cars) # model with all variables added as predictor variables. 
 
-bestModel <- step(fullModel, nullModel, direction = "both") #both direction step model
+bestModel <- step(fullModel, nullModel, direction = "both" , k=  log(nrow(cars))) #both direction BIC step model
 
 bestModel$call  #display formula
 ```
@@ -167,59 +178,45 @@ nullModel <- lm (mpg ~ 1 , data =cars) # model with no predictor variables.
 
 fullModel <- lm (mpg ~ . , data = cars) # model with all variables added as predictor variables. 
 
-bestModel <- step(fullModel, nullModel, direction = "both") #both direction step model
+bestModel <- step(fullModel, nullModel, direction = "both", k=  log(nrow(cars))) #both direction step model
 
 bestModel$call  #display formula
 ```
 
 
-* The variables mentioned by bestModel are uncorrelated and most significant to predict mpg
-* We will now run the anova to see if the new model is statistically different from the previous model. 
-
-
-```{r}
-anova(bestModel, model1)
-```
-
-From the above output, we reject the null hypothesis With a p-value of **`r anova(bestModel, model1)$Pr[2]`** ,  and say that there is a statistically significant difference in model1 and bestModel. 
+* The variables mentioned by bestModel are uncorrelated and most useful set of predictors
+* The final model `bestModel` contains three predictors, wt(weight), qsec(1/4 mile time) and am(Transmission)  
+ 
 
 Summarizing the new Model.
 
 ```{r}
 summary(bestModel)
-bestModel$call
 ```
   
   
   
-**Interpretation**  
+**Interpretation of Multiple Regression**  
 
-* The final model contains four predictors, cyl (number of cylinders), hp (horsepower), wt (weight) and am (transmission type).  
   
-* Adjusted R square value says, that **`r round(summary(bestModel)$adj.r.squared*100,2)`%** of the variance can be explained by this model.  
+* Adjusted R square value says, that **`r round(summary(bestModel)$adj.r.squared*100,2)`%** of the variance can be explained by this model.Which is a significant improvement over first model.  
+  
+* Coefficient for `am` says that, on average, manual transmission cars have **`r round(summary(bestModel)$coefficients[4],3)`**  MPGs more than automatic transmission cars. 
 
-* Above 4 Cylinder has a negative impact on Mileage  
-    * A 6 cylinder engine reduces MPG by **`r round(abs(bestModel$coefficients[[2]]),3)`**  
-    * An 8 cylinder engine reduces the mileage by **`r round(abs(bestModel$coefficients[[3]]),3)`** MPG, respectively.  
-  
-  
-* Per unit **horsepower** increase decreases  mileage by **`r round(abs(bestModel$coefficients[[4]]),3) ` MPG**  
-  
-* A 1000 pound increase in weight reduces mileage by **`r round(abs(bestModel$coefficients[[5]]),3) ` MPG**  
-
-* For am `transmission type` we fail to reject the null hypothesis at p value of `0.20` , and can say that it does not contribute significantly to the variance. 
+* The p-value for `am` is `0.046` which makes it a weakest predictor of mileage.
 
 -------------------------------------------------------------------
 
-  
  
-## Result
+### Conclusion
 
-1. Mileage of a car can be best calculated by model `lm(formula = mpg ~ cyl + hp + wt + am, data = cars)` 
-  
-2. This analysis was not able to find any significant link between the transmission type and fuel consumption   
-  
-  
+When seen with just one predictor `am` we get Manual transmission to yield `7.245`mpg higher than automatic transmission. Only **`r round(summary(model1)$adj.r.squared*100,2)`%** of variance could be explained in this case.
+
+With addition of more predictors, difference in mileage between manual transmission and automatic transmission is just `2.936`mpg. The p-value significance of transmission is also very low. Weight and qsec have [confounded](http://en.wikipedia.org/wiki/Confounding/ "wiki article") the relationship between transmission and mpg, this model explains over **`r round(summary(bestModel)$adj.r.squared*100,2)`%** of the variance. 
+
+
+You can access the code for the above analysis at my github repository. <https://github.com/shubhamkalra27/mtcars-analysis>
+
 -----------------------------------------  
   
 #### References. 
@@ -228,3 +225,5 @@ bestModel$call
 2. Density Plot. <http://www.statmethods.net/graphs/density.html>   
 3. Analysis on mtcars dataset to predict mpg <http://varianceexplained.org/RData/code/code_lesson3/>
 4. BoxPlot using ggplot2 <http://www.statmethods.net/advgraphs/ggplot2.html>
+5. More on factors <http://www.stat.berkeley.edu/~s133/factors.html>  
+6. Confounding Variables <http://en.wikipedia.org/wiki/Confounding/>
