@@ -142,7 +142,7 @@ head(cars)</code></pre>
 ## Hornet Sportabout 18.7   8  360 175 3.15 3.440 17.02  0  0    3    2
 ## Valiant           18.1   6  225 105 2.76 3.460 20.22  1  0    3    1</code></pre>
 <p>One may also run <code>summary(cars)</code> to get more interesting statistics about each variable. We observe that few variables such as ‘Number of Cylinders’, ‘Number of forward gears’, etc. are categorical variables. We convert those to <a href="http://www.stat.berkeley.edu/~s133/factors.html">factors</a>.</p>
-<pre class="r"><code># Changing classifying variables  from binary values to factor
+<pre class="r"><code># Changing classifying variables from numeric values to factor
 
 cars$cyl &lt;- factor(cars$cyl)
 cars$vs &lt;- factor(cars$vs)
@@ -169,8 +169,8 @@ cars$carb &lt;- factor(cars$carb)</code></pre>
 <li>Manual transmission is better than Automatic transmission.<br /></li>
 <li>We see the range of values and check for outliers.</li>
 </ul>
-<p>Next we will check if they are statistically significant using a <a href="http://www.itl.nist.gov/div898/handbook/eda/section3/eda353.htm">two sample t-test</a>.</p>
 <p>Code for the above plots are available on my github repository, you can fork the entire code <a href="https://github.com/shubhamkalra27/mtcars-analysis/blob/master/mtcars.R">here</a>.</p>
+<p>Next we will check if they are statistically significant using a <a href="http://www.itl.nist.gov/div898/handbook/eda/section3/eda353.htm">two sample t-test</a>.</p>
 <hr />
 </div>
 <div id="two-sample-t-test" class="section level3">
@@ -334,7 +334,7 @@ bestModel$call  #display formula</code></pre>
 ## - wt    1   183.347 352.63 87.187</code></pre>
 <pre><code>## lm(formula = mpg ~ wt + qsec + am, data = cars)</code></pre>
 <ul>
-<li>The variables mentioned by bestModel are non-collinear and most useful set of predictors</li>
+<li>The variables mentioned by bestModel are most useful set of predictors</li>
 <li>The final model <code>bestModel</code> contains three predictors, wt(weight), qsec(1/4 mile time) and am(Transmission)</li>
 </ul>
 <p>Summarizing the new Model.</p>
@@ -362,7 +362,7 @@ bestModel$call  #display formula</code></pre>
 <p><strong>Interpretation of Multiple Regression</strong></p>
 <ul>
 <li><p>Adjusted R square value signifies that <strong>83.36%</strong> of the variance can be explained by this model, which is a significant improvement over first model.</p></li>
-<li><p>1000 pound increase in weight of a car, keeping all other variables constant, yields <strong>3.917</strong> less MPG</p></li>
+<li><p>1000 pound increase in <code>wt</code>(weight) of a car, keeping all other variables constant, decreases MPG by <strong>3.917</strong></p></li>
 <li><p>1 unit change in <code>qsec</code>(1/4 mile time), with all other variables constant, increases MPG by <strong>1.226</strong></p></li>
 <li><p>Coefficient for <code>am</code> signifies that, manual transmission cars have an average MPG of <strong>2.936</strong> more than that of automatic transmission cars.</p></li>
 <li><p>The p-value for <code>am</code> is <code>0.046</code> which makes it a weakest predictor of mileage.</p></li>

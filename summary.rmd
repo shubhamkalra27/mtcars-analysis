@@ -49,7 +49,7 @@ One may also run `summary(cars)` to get more interesting statistics about each v
 
 
 ```{r}
-# Changing classifying variables  from binary values to factor
+# Changing classifying variables from numeric values to factor
 
 cars$cyl <- factor(cars$cyl)
 cars$vs <- factor(cars$vs)
@@ -115,10 +115,11 @@ From the box plot, we observe the following:
 * Manual transmission is better than Automatic transmission.  
 * We see the range of values and check for outliers. 
 
+Code for the above plots are available on my github repository, you can fork the entire code [here](https://github.com/shubhamkalra27/mtcars-analysis/blob/master/mtcars.R). 
+
 Next we will check if they are statistically significant using a [two sample t-test](http://www.itl.nist.gov/div898/handbook/eda/section3/eda353.htm). 
   
   
-Code for the above plots are available on my github repository, you can fork the entire code [here](https://github.com/shubhamkalra27/mtcars-analysis/blob/master/mtcars.R). 
    
 -----------------------------------  
   
@@ -184,7 +185,7 @@ bestModel$call  #display formula
 ```
 
 
-* The variables mentioned by bestModel are non-collinear and most useful set of predictors
+* The variables mentioned by bestModel are most useful set of predictors
 * The final model `bestModel` contains three predictors, wt(weight), qsec(1/4 mile time) and am(Transmission)  
  
 
@@ -201,7 +202,7 @@ summary(bestModel)
   
 * Adjusted R square value signifies that **`r round(summary(bestModel)$adj.r.squared*100,2)`%** of the variance can be explained by this model, which is a significant improvement over first model.  
   
-* 1000 pound increase in weight of a car, keeping all other variables constant, yields **`r round(abs(summary(bestModel)$coefficients[2]),3)`** less MPG
+* 1000 pound increase in `wt`(weight) of a car, keeping all other variables constant, decreases MPG by **`r round(abs(summary(bestModel)$coefficients[2]),3)`**
 
 * 1 unit change in `qsec`(1/4 mile time), with all other variables constant, increases MPG by **`r round(abs(summary(bestModel)$coefficients[3]),3)`**
 
