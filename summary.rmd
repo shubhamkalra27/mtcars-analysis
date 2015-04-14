@@ -150,7 +150,7 @@ model1 <- lm( mpg~am ,data=mtcars); summary(model1)
 **Interpretation of simple linear regression**  
 
 * Intercept value implies that cars with Automatic Transmission have on average  **`r round(summary(model1)$coefficients[1],3)`** MPG  
-* Coefficient of the parameter `am` implies that Manual transmission cars add on average **`r round(summary(model1)$coefficients[2],3)`** MPG's more to the Automatic car's mean value  
+* Coefficient of the parameter `am` implies that Manual transmission cars add on average **`r round(summary(model1)$coefficients[2],3)`** MPG's more to the Automatic car's mean value.  
 * Adj R square value says, that only **`r round(summary(model1)$adj.r.squared*100,2)`%** of deviation in model can be explained by the current model with one predictor.
   
 
@@ -185,8 +185,8 @@ bestModel$call  #display formula
 ```
 
 
-* The variables mentioned by bestModel are most useful set of predictors
-* The final model `bestModel` contains three predictors, wt(weight), qsec(1/4 mile time) and am(Transmission)  
+* The variables mentioned by bestModel are most useful set of predictors.
+* The final model `bestModel` contains three predictors, wt(weight), qsec(1/4 mile time) and am(Transmission).  
  
 
 Summarizing the new Model.
@@ -224,7 +224,7 @@ Multiple regression on stepwise regressed variables defines **`r round(summary(b
 
 -----------------------------------------  
   
-#### References. 
+#### References 
 
 1. mtcars dataset <https://stat.ethz.ch/R-manual/R-devel/library/datasets/html/mtcars.html>
 2. Density Plot. <http://www.statmethods.net/graphs/density.html>   

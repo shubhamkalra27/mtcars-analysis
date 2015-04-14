@@ -216,7 +216,7 @@ cars$carb &lt;- factor(cars$carb)</code></pre>
 <p><strong>Interpretation of simple linear regression</strong></p>
 <ul>
 <li>Intercept value implies that cars with Automatic Transmission have on average <strong>17.147</strong> MPG<br /></li>
-<li>Coefficient of the parameter <code>am</code> implies that Manual transmission cars add on average <strong>7.245</strong> MPG’s more to the Automatic car’s mean value<br /></li>
+<li>Coefficient of the parameter <code>am</code> implies that Manual transmission cars add on average <strong>7.245</strong> MPG’s more to the Automatic car’s mean value.<br /></li>
 <li>Adj R square value says, that only <strong>33.85%</strong> of deviation in model can be explained by the current model with one predictor.</li>
 </ul>
 <blockquote>
@@ -334,8 +334,8 @@ bestModel$call  #display formula</code></pre>
 ## - wt    1   183.347 352.63 87.187</code></pre>
 <pre><code>## lm(formula = mpg ~ wt + qsec + am, data = cars)</code></pre>
 <ul>
-<li>The variables mentioned by bestModel are most useful set of predictors</li>
-<li>The final model <code>bestModel</code> contains three predictors, wt(weight), qsec(1/4 mile time) and am(Transmission)</li>
+<li>The variables mentioned by bestModel are most useful set of predictors.</li>
+<li>The final model <code>bestModel</code> contains three predictors, wt(weight), qsec(1/4 mile time) and am(Transmission).</li>
 </ul>
 <p>Summarizing the new Model.</p>
 <pre class="r"><code>summary(bestModel)</code></pre>
@@ -374,8 +374,8 @@ bestModel$call  #display formula</code></pre>
 <p>Mileage (mpg), when modeled with just one predictor <code>am</code>, we get manual transmission to yield an average of <code>7.245</code>mpg higher than automatic transmission. Here, only <strong>33.85%</strong> of variance could be explained.</p>
 <p>Multiple regression on stepwise regressed variables defines <strong>83.36</strong>% of variability. <code>wt</code> and <code>qsec</code> have <a href="http://en.wikipedia.org/wiki/Confounding">confounded</a> the relationship between <code>am</code> and <code>mpg</code>. Manual transmission in this model increases mileage by only <code>2.936 mpg</code></p>
 <hr />
-<div id="references." class="section level4">
-<h4>References.</h4>
+<div id="references" class="section level4">
+<h4>References</h4>
 <ol style="list-style-type: decimal">
 <li>mtcars dataset <a href="https://stat.ethz.ch/R-manual/R-devel/library/datasets/html/mtcars.html" class="uri">https://stat.ethz.ch/R-manual/R-devel/library/datasets/html/mtcars.html</a></li>
 <li>Density Plot. <a href="http://www.statmethods.net/graphs/density.html" class="uri">http://www.statmethods.net/graphs/density.html</a><br /></li>
