@@ -1,4 +1,5 @@
 
+#custom function to check and install packages
 usePackage <- function(pkg){
   new.pkg <- pkg[!(pkg %in% installed.packages()[, "Package"])]
   if (length(new.pkg)) 
@@ -77,8 +78,15 @@ bestModel$call  #display formula
 summary(bestModel)
 
 
-#==================== Analysis ends here==========================
-'here are a few more things you can do during the analysis '
+#=======================================================
+#=======================================================
+#=======================================================
+#=======================================================
+#================== Additional Analysis ================
+#=======================================================
+#=======================================================
+#=======================================================
+'Some more techniques which helps to understand analysis'
 
 # Check for model assumptions 
 plot(bestModel)

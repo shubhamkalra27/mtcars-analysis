@@ -63,7 +63,7 @@ img {
 <div id="header">
 <h1 class="title">Does Mileage depend on transmission type</h1>
 <h4 class="author"><em>Shubham Kalra</em></h4>
-<h4 class="date"><em>Thursday, April 09, 2015</em></h4>
+<h4 class="date"><em>Friday, April 10, 2015</em></h4>
 </div>
 
 
@@ -72,7 +72,7 @@ img {
 <p>This article is written keeping in mind audience with statistical know how. One can replicate the study using code snippets provided alongside. To keep the analysis more organized and less overwhelming, I have divided into various sub-sections. Lets jump right into it.</p>
 <div id="exploratory-data-analysis" class="section level3">
 <h3>Exploratory Data Analysis</h3>
-<p>The data comprises of fuel consumption and 10 other aspects of automobile design and performance for 32 automobiles (1973-“74 models).</p>
+<p>The data comprises of fuel consumption and 10 aspects of automobile design and performance for 32 automobiles (1973–74 models).</p>
 <p><strong>mtcars is data frame with 32 observations on 11 variables</strong></p>
 <table>
 <thead>
@@ -141,7 +141,7 @@ head(cars)</code></pre>
 ## Hornet 4 Drive    21.4   6  258 110 3.08 3.215 19.44  1  0    3    1
 ## Hornet Sportabout 18.7   8  360 175 3.15 3.440 17.02  0  0    3    2
 ## Valiant           18.1   6  225 105 2.76 3.460 20.22  1  0    3    1</code></pre>
-<p>One may also run <code>summary(cars)</code> to get more interesting statistics about each variable. We observe that few variables such as ‘Number of Cylinders’, ‘Number of forward gears’, etc. are categorical variables. We convert those to <a href="http://www.stat.berkeley.edu/~s133/factors.html">factor variables</a>.</p>
+<p>One may also run <code>summary(cars)</code> to get more interesting statistics about each variable. We observe that few variables such as ‘Number of Cylinders’, ‘Number of forward gears’, etc. are categorical variables. We convert those to <a href="http://www.stat.berkeley.edu/~s133/factors.html">factors</a>.</p>
 <pre class="r"><code># Changing classifying variables  from binary values to factor
 
 cars$cyl &lt;- factor(cars$cyl)
@@ -171,9 +171,11 @@ cars$carb &lt;- factor(cars$carb)</code></pre>
 </ul>
 <p>Next we will check if they are statistically significant using a <a href="http://www.itl.nist.gov/div898/handbook/eda/section3/eda353.htm">two sample t-test</a>.</p>
 <p>Code for the above plots are available on my github repository, you can fork the entire code <a href="https://github.com/shubhamkalra27/mtcars-analysis/blob/master/mtcars.R">here</a>.</p>
-<div id="two-sample-t-test" class="section level4">
-<h4>Two Sample t-test</h4>
-<p>Two Sample t-test is used to compare the means of a normally distributed interval dependent variable for two independent groups.</p>
+<hr />
+</div>
+<div id="two-sample-t-test" class="section level3">
+<h3>Two Sample t-test</h3>
+<p>Two-sample t-test is applied to compare whether the average difference between two groups is really significant or if it is due instead to random chance.</p>
 <pre class="r"><code>t.test(mpg~am, data = cars)</code></pre>
 <pre><code>## 
 ##  Welch Two Sample t-test
@@ -188,7 +190,6 @@ cars$carb &lt;- factor(cars$carb)</code></pre>
 ##        17.14737        24.39231</code></pre>
 <p><strong>Interpretation</strong><br />From the above output, we reject the null hypothesis with a p-value of <strong>0.001374</strong>, and say that there is a statistically significant difference in mean mileage between manual transmission and automatic transmission.</p>
 <p>We will now Quantify that difference using Regression techniques.</p>
-</div>
 </div>
 <div id="simple-linear-regression" class="section level3">
 <h3>Simple linear regression</h3>
@@ -214,17 +215,17 @@ cars$carb &lt;- factor(cars$carb)</code></pre>
 ## F-statistic: 16.86 on 1 and 30 DF,  p-value: 0.000285</code></pre>
 <p><strong>Interpretation of simple linear regression</strong></p>
 <ul>
-<li>Intercepts value means that Automatic Transmission has <strong>17.147</strong> average MPG<br /></li>
-<li>Coefficient value of <code>am</code> says that Manual transmission cars add <strong>7.245</strong> MPG’s more to the Automatic’s mean value<br /></li>
+<li>Intercept value implies that cars with Automatic Transmission have on average <strong>17.147</strong> MPG<br /></li>
+<li>Coefficient of the parameter <code>am</code> implies that Manual transmission cars add on average <strong>7.245</strong> MPG’s more to the Automatic car’s mean value<br /></li>
 <li>Adj R square value says, that only <strong>33.85%</strong> of deviation in model can be explained by the current model with one predictor.</li>
 </ul>
 <blockquote>
-<p>Before making any conclusions on the effect of transmission type on mileage, we look at the impact of other variables on the mileage</p>
+<p>Before making any conclusions on the effect of transmission type on mileage, we look at the impact of other variables on mileage</p>
 </blockquote>
 </div>
 <div id="multiple-regression" class="section level3">
 <h3>Multiple Regression</h3>
-<p>Next, we would like to see dependence of other variables on Mileage. To find out which preditor variables to use in our model, we run a Stepwise regression to identify useful subset of predictors.</p>
+<p>Next, we would like to determine dependence of other variables on Mileage. To find out which preditor variables to use in our model, we run a Stepwise regression to identify useful subset of predictors.</p>
 <pre class="r"><code>nullModel &lt;- lm (mpg ~ 1 , data =cars) # model with no predictor variables.
 
 fullModel &lt;- lm (mpg ~ . , data = cars) # model with all variables added as predictor variables. 
@@ -361,6 +362,8 @@ bestModel$call  #display formula</code></pre>
 <p><strong>Interpretation of Multiple Regression</strong></p>
 <ul>
 <li><p>Adjusted R square value signifies that <strong>83.36%</strong> of the variance can be explained by this model, which is a significant improvement over first model.</p></li>
+<li><p>1000 pound increase in weight of a car, keeping all other variables constant, yields <strong>3.917</strong> less MPG</p></li>
+<li><p>1 unit change in <code>qsec</code>(1/4 mile time), with all other variables constant, increases MPG by <strong>1.226</strong></p></li>
 <li><p>Coefficient for <code>am</code> signifies that, manual transmission cars have an average MPG of <strong>2.936</strong> more than that of automatic transmission cars.</p></li>
 <li><p>The p-value for <code>am</code> is <code>0.046</code> which makes it a weakest predictor of mileage.</p></li>
 </ul>
@@ -380,6 +383,7 @@ bestModel$call  #display formula</code></pre>
 <li>BoxPlot using ggplot2 <a href="http://www.statmethods.net/advgraphs/ggplot2.html" class="uri">http://www.statmethods.net/advgraphs/ggplot2.html</a></li>
 <li>More on factors <a href="http://www.stat.berkeley.edu/~s133/factors.html" class="uri">http://www.stat.berkeley.edu/~s133/factors.html</a><br /></li>
 <li>Confounding Variables <a href="http://en.wikipedia.org/wiki/Confounding/" class="uri">http://en.wikipedia.org/wiki/Confounding/</a></li>
+<li>two-sample t test <a href="http://www.isixsigma.com/tools-templates/hypothesis-testing/making-sense-two-sample-t-test/" class="uri">http://www.isixsigma.com/tools-templates/hypothesis-testing/making-sense-two-sample-t-test/</a></li>
 </ol>
 <hr />
 <p>You can access the code for the above analysis at my github repository. <a href="https://github.com/shubhamkalra27/mtcars-analysis" class="uri">https://github.com/shubhamkalra27/mtcars-analysis</a></p>
